@@ -1,6 +1,5 @@
 package cn.wode490390.nukkit.theend.task;
 
-import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.generator.Generator;

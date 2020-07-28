@@ -2,11 +2,9 @@ package cn.wode490390.nukkit.theend.listener;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.BlockEndPortal;
-import cn.nukkit.entity.Entity;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
-import cn.nukkit.event.entity.EntityMotionEvent;
 import cn.nukkit.event.entity.EntityPortalEnterEvent;
 import cn.nukkit.event.player.PlayerMoveEvent;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
@@ -30,9 +28,9 @@ public class PortalListener implements Listener {
 
     @EventHandler
     public void onDataPacketReceive(DataPacketReceiveEvent event) {
-        Player player = event.getPlayer();
         DataPacket packet = event.getPacket();
         if (packet instanceof ShowCreditsPacket) {
+            Player player = event.getPlayer();
             ShowCreditsPacket showCreditsPacket = (ShowCreditsPacket) packet;
             if (showCreditsPacket.status == ShowCreditsPacket.STATUS_END_CREDITS && this.showing.remove(player.getId())) {
                 Position respawnPos = player.getSpawn();
@@ -56,7 +54,7 @@ public class PortalListener implements Listener {
                 player.removeAllEffects();
 
                 //this is a dirty hack to prevent dying in a different level than the respawn point from breaking everything
-                player.teleportImmediate(new Location(respawnPos.x, -100, respawnPos.z, respawnPos.level));
+                player.teleportImmediate(new Location(respawnPos.x, -100, respawnPos.z, respawnPos.level), null);
                 player.teleport(respawnPos, null);
             }
         }
@@ -65,11 +63,11 @@ public class PortalListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player.getLevel().getBlock(player.getFloorX(), player.getFloorY(), player.getFloorZ()) instanceof BlockEndPortal && player.y - player.getFloorY() < 0.75) {
+        if (player.getLevel().getBlockIdAt(player.getFloorX(), player.getFloorY(), player.getFloorZ()) == BlockID.END_PORTAL/* && player.y - player.getFloorY() < 0.75*/) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(player, EntityPortalEnterEvent.PortalType.END);
             Server.getInstance().getPluginManager().callEvent(ev);
             if (!ev.isCancelled()) {
-                Position newPos = moveToTheEnd(player);
+                Position newPos = moveToTheEnd(player, player);
                 if (newPos != null) {
                     for (int x = -2; x < 3; x++) {
                         for (int z = -2; z < 3; z++) {
@@ -106,7 +104,7 @@ public class PortalListener implements Listener {
     }
 
     //@EventHandler //TODO: bug
-    public void onEntityMotion(EntityMotionEvent event) {
+    /*public void onEntityMotion(EntityMotionEvent event) {
         Entity entity = event.getEntity();
         if (entity.getLevel().getBlock(entity.getFloorX(), entity.getFloorY(), entity.getFloorZ()) instanceof BlockEndPortal && entity.y - entity.getFloorY() < 0.75) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(entity, EntityPortalEnterEvent.PortalType.END);
@@ -138,19 +136,19 @@ public class PortalListener implements Listener {
                 }
             }
         }
-    }
+    }*/
 
-    @EventHandler
+    /*@EventHandler
     public void onEntityPortalEnter(EntityPortalEnterEvent event) {
         if (event.getPortalType() == EntityPortalEnterEvent.PortalType.NETHER) {
             Entity entity = event.getEntity();
-            if (entity.level == entity.getServer().getLevelByName("the_end")) {
+            if (entity.level.getName().equals("the_end")) {
                 event.setCancelled();
             }
         }
-    }
+    }*/
 
-    private static Position moveToTheEnd(Position current) {
+    private static Position moveToTheEnd(Player player, Position current) {
         Preconditions.checkNotNull(current);
 
         if (!Server.getInstance().loadLevel("the_end")) {
@@ -165,7 +163,7 @@ public class PortalListener implements Listener {
         Level the_end = Server.getInstance().getLevelByName("the_end");
         if (the_end != null) {
             if (current.level == the_end) {
-                return Server.getInstance().getDefaultLevel().getSpawnLocation();
+                return player.getSpawn().getLevel() != the_end ? player.getSpawn() : Server.getInstance().getDefaultLevel().getSpawnLocation();
             } else {
                 return new Position(100.5, 49, 0.5, the_end);
             }

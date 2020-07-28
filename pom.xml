@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.wode490390.nukkit</groupId>
-    <artifactId>theend</artifactId>
+    <artifactId>TheEnd</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.0</version>
+    <version>1.1.0-IGN</version>
     <name>TheEnd</name>
     <description>TheEnd plugin for Nukkit</description>
     <url>http://wode490390.cn/</url>
@@ -68,7 +68,6 @@
     </dependencies>
 
     <build>
-        <finalName>wodeTheEnd-${project.version}</finalName>
         <defaultGoal>clean package</defaultGoal>
         <resources>
             <resource>

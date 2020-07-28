@@ -44,7 +44,7 @@ public class TheEndGenerator extends Generator {
         detailNoiseScaleZ = getConfig(config, "generator.end.detail.noise-scale.z", 80d);
 
         activated = getConfig(config, "exit-portal-activated", true);
-        spawnDragon = getConfig(config, "spawn-ender-dragon", true);
+        spawnDragon = getConfig(config, "spawn-ender-dragon", false);
     }
 
     protected final double[][][] density = new double[3][3][33];
